@@ -1,12 +1,29 @@
 ﻿using System;
+using System.Dynamic;
 
 namespace ConsoleDrawer
 {
 
+    class X {
+        public string Name {
+            get {
+                return "X";
+            }
+        }
+    }
+
     class Program
     {
+
         static void Main(string[] args)
         {
+
+            dynamic d = new ExpandoObject();
+            d.Name = "Hola";
+            d.Age = 10;
+
+            Console.WriteLine($"Hola soy {d.Name} y tengo {d.Age} años");
+
             Console.WriteLine("1 - Nuevo dibujo");
             Console.WriteLine("2 - Salir");
 
@@ -21,6 +38,12 @@ namespace ConsoleDrawer
             var info = Console.ReadKey();
             if (info.KeyChar == '1') {
                 var dibujo = new Dibujo();
+
+                dibujo.AddFigura(FiguraFactory.Instance.GetTexto("Hola", 10, 10));
+                dibujo.AddFigura(FiguraFactory.Instance.GetCuadrado( 1, 3));
+
+                dibujo.Save("drawing.json");
+
                 dibujo.Dibujar();
                 Console.Read();
                 return true;

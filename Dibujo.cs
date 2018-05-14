@@ -1,26 +1,67 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+
 
 namespace ConsoleDrawer {
     public class Dibujo {
-        private Lista<IFigura> _figuras;
+        private readonly List<IFigura> _figuras;
 
         public Dibujo() {
-            _figuras = new Lista<IFigura>(10);
-            _figuras.Add(new Texto(10, 5, "Hola a todos"));
-            _figuras.Add(new Cuadrado(2, 10));
+            _figuras = new List<IFigura>(10);
+        }
 
-            var arr = new[] {1,2,4,6,2,4,10};
-            arr.OrderBy(x => x).Take(2).Sum()
+        public IFigura this[string name] {
+            get {
+                return _figuras.FirstOrDefault(x => x.Name == name );
+            }
+        }
 
+        public IEnumerable<string> Names {
+            get {
+                return _figuras
+                    .OrderBy(f => f.Name)
+                    .Select(f => f.Name);
+            }
+        }
+
+        public IEnumerable<IFigura> Figuras {
+            get {
+                return _figuras;
+            }
+        }
+
+        public T GetByName<T>(string name, T t) 
+            where T : class, IFigura
+         {
+            return this[name] as T;
+        }
+
+        public void AddFigura(IFigura figura) {
+            _figuras.Add(figura);
         }
 
         public void Dibujar() {
             foreach (var figura in _figuras) {
                 figura?.Dibujar();
             }
+        }
+
+        public void Save(string path) {
+            var cuadrados = _figuras.OfType<Cuadrado>();
+            var textos = _figuras.OfType<Texto>();
+
+            var resultado = new {
+                Cuadrados = cuadrados,
+                Textos = textos,
+                Count = _figuras.Count
+            };
+
+            var json = JsonConvert.SerializeObject(resultado);
+            File.WriteAllText(path, json);
         }
 
     }
